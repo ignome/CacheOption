@@ -58,7 +58,7 @@ class CacheOption
     public static function rememberHashMap($key, Closure $callback, $fields = [])
     {
         if (!empty($fields)) {
-            $data = static::hashMGetRedis($key);
+            $data = static::hashMGetRedis($key,$fields);
             $missingFields = array_filter($data, function ($value) {
                 return $value === false || $value === null;
             });
