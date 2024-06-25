@@ -5,7 +5,7 @@ namespace Ignome\Library;
 use Closure;
 
 
-trait CacheOption
+class CacheOption
 {
 
     /**
@@ -15,15 +15,15 @@ trait CacheOption
      * @param Closure $func
      * @return void
      */
-    public function remember($key, $ttl, Closure $callback)
+    public static function remember($key, $ttl, Closure $callback)
     {
-        $value = $this->getRedis($key);
+        $value = static::getRedis($key);
         if (!empty($value)) {
             return $value;
         }
         $value = $callback();
         if (!empty($value)) {
-            $this->putRedis($key, $value, value($ttl, $value));
+            static::putRedis($key, $value, value($ttl, $value));
         }
         return $value;
     }
@@ -34,15 +34,15 @@ trait CacheOption
      * @param Closure $func
      * @return void
      */
-    public function rememberForever($key, Closure $callback)
+    public static function rememberForever($key, Closure $callback)
     {
-        $value = $this->getRedis($key);
+        $value = static::getRedis($key);
         if (!empty($value)) {
             return $value;
         }
         $value = $callback();
         if (!empty($value)) {
-            $this->foreverRedis($key, $value);
+            static::foreverRedis($key, $value);
         }
         return $value;
     }
@@ -55,10 +55,10 @@ trait CacheOption
      * @param $field
      * @return void
      */
-    public function rememberHashMap($key, Closure $callback, $fields = [])
+    public static function rememberHashMap($key, Closure $callback, $fields = [])
     {
         if (!empty($fields)) {
-            $data = $this->hashMGetRedis($key);
+            $data = static::hashMGetRedis($key);
             $missingFields = array_filter($data, function ($value) {
                 return $value === false || $value === null;
             });
@@ -66,14 +66,14 @@ trait CacheOption
                 return $data;
             }
         } else {
-            $data = $this->hashMGetAllRedis($key);
+            $data = static::hashMGetAllRedis($key);
             if (!empty($data)) {
                 return $data;
             }
         }
 
         $value = $callback();
-        $this->hashMSetRedis($key, $value);
+        static::hashMSetRedis($key, $value);
         if (!empty($fields)) {
             return array_intersect_key($value, array_flip($fields));
         } else {
@@ -89,14 +89,14 @@ trait CacheOption
      * @param $fields
      * @return mixed
      */
-    public function rememberHash($key, $field, Closure $callback)
+    public static function rememberHash($key, $field, Closure $callback)
     {
-        $data = $this->hashGetRedis($key, $field);
+        $data = static::hashGetRedis($key, $field);
         if (!empty($data)) {
             return $data;
         }
         $value = $callback();
-        $this->hashSetRedis($key, $field, $value);
+        static::hashSetRedis($key, $field, $value);
         return $value;
     }
 
@@ -107,10 +107,10 @@ trait CacheOption
      * @param Closure $callback
      * @return false|string
      */
-    public function clearRemember($key, Closure $callback)
+    public static function clearRemember($key, Closure $callback)
     {
         $value = $callback();
-        $this->forgetRedis($key);
+        static::forgetRedis($key);
         return json_encode($value, true);
     }
 
@@ -121,16 +121,16 @@ trait CacheOption
      * @param $ttl
      * @return bool|null
      */
-    public function putRedis($key, $value, $ttl = null)
+    private static function putRedis($key, $value, $ttl = null)
     {
         if ($ttl === null) {
-            return $this->foreverRedis($key, $value);  //永久缓存
+            return static::foreverRedis($key, $value);  //永久缓存
         }
         if (!is_numeric($ttl) || $ttl <= 0) {
-            return $this->forgetRedis($key); //删除缓存
+            return static::forgetRedis($key); //删除缓存
         }
         //存入数所库
-        return $this->putSetRedis($key, $value, $ttl);
+        return static::putSetRedis($key, $value, $ttl);
     }
 
 
@@ -141,7 +141,7 @@ trait CacheOption
      * @param $ttl
      * @return bool
      */
-    public function putSetRedis($key, $value, $ttl)
+    private static function putSetRedis($key, $value, $ttl)
     {
         $odds = mt_rand(100, 200) / 100;
         $ttl = (int)($ttl * $odds);
@@ -155,7 +155,7 @@ trait CacheOption
      * @return void
      */
 
-    public function foreverRedis($key, $value)
+    private static function foreverRedis($key, $value)
     {
         return RedisOptions::set($key, $value, null);
     }
@@ -165,7 +165,7 @@ trait CacheOption
      * @param $key
      * @return void
      */
-    public function forgetRedis($key)
+    private static function forgetRedis($key)
     {
         return RedisOptions::del($key);
     }
@@ -176,7 +176,7 @@ trait CacheOption
      * @param $key
      * @return void
      */
-    public function getRedis($key)
+    private static function getRedis($key)
     {
         return RedisOptions::get($key);
     }
@@ -187,7 +187,7 @@ trait CacheOption
      * @param $fields
      * @return mixed
      */
-    public function hashMGetRedis($key, $fields)
+    private static function hashMGetRedis($key, $fields)
     {
         return RedisOptions::hMGet($key, $fields);
     }
@@ -197,7 +197,7 @@ trait CacheOption
      * @param $key
      * @return array
      */
-    public function hashMGetAllRedis($key)
+    private static function hashMGetAllRedis($key)
     {
         return RedisOptions::hGetAll($key);
     }
@@ -208,7 +208,7 @@ trait CacheOption
      * @param $fields
      * @return bool
      */
-    public function hashMSetRedis($key, $fields)
+    private static function hashMSetRedis($key, $fields)
     {
         return RedisOptions::hMSet($key, $fields);
     }
@@ -219,7 +219,7 @@ trait CacheOption
      * @param $field
      * @return array|false|string
      */
-    public function hashGetRedis($key, $field)
+    private static function hashGetRedis($key, $field)
     {
         return RedisOptions::hGet($key, $field);
     }
@@ -231,7 +231,7 @@ trait CacheOption
      * @param $value
      * @return bool|int
      */
-    public function hashSetRedis($key, $field, $value)
+    private static function hashSetRedis($key, $field, $value)
     {
         return RedisOptions::hSet($key, $field, $value);
     }
