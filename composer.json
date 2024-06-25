@@ -1,0 +1,21 @@
+{
+    "name": "ignome/cache-option",
+    "description": "This is a general caching tool",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Ignome\\CacheOption\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "ignome",
+            "email": "ignome@foxmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "ext-redis": "*"
+    }
+}
