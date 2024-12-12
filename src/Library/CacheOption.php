@@ -23,7 +23,7 @@ class CacheOption
         }
         $value = $callback();
         if (!empty($value)) {
-            static::putRedis($key, $value, value($ttl, $value));
+            static::putRedis($key, $value, $ttl);
         }
         return $value;
     }
