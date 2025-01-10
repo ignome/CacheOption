@@ -206,11 +206,12 @@ class CacheOption
      * HASH 多个处理
      * @param $key
      * @param $fields
-     * @return bool
+     * @param $expire
+     * @return mixed
      */
-    private static function hashMSetRedis($key, $fields)
+    private static function hashMSetRedis($key, $fields, $expire = null)
     {
-        return RedisOptions::hMSet($key, $fields);
+        return RedisOptions::hMSet($key, $fields, $expire);
     }
 
     /**
@@ -229,21 +230,22 @@ class CacheOption
      * @param $key
      * @param $field
      * @param $value
-     * @return bool|int
+     * @param $expire
+     * @return mixed
      */
-    private static function hashSetRedis($key, $field, $value)
+    private static function hashSetRedis($key, $field, $value, $expire = null)
     {
-        return RedisOptions::hSet($key, $field, $value);
+        return RedisOptions::hSet($key, $field, $value, $expire);
     }
 
     /**
      * 设置缓存过期时间
      * @param $key
-     * @param $ttl
+     * @param $expire
      * @return bool
      */
-    private static function expire($key, $ttl)
+    private static function expire($key, $expire)
     {
-        return RedisOptions::expire($key, $ttl);
+        return RedisOptions::expire($key, $expire);
     }
 }

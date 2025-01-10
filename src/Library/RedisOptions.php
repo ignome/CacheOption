@@ -289,11 +289,12 @@ LUA;
      * @param $key
      * @param $hashKey
      * @param $value
-     * @return bool|int
+     * @param $expire
+     * @return mixed
      */
-    public static function hSet($key, $hashKey, $value)
+    public static function hSet($key, $hashKey, $value, $expire = self::TOW_MINUTE)
     {
-        return self::getRedisInstance()->hSet($key, (string)$hashKey, is_array($value) ? json_encode($value) : $value);
+        return self::getRedisInstance()->hSet($key, (string)$hashKey, is_array($value) ? json_encode($value) : $value)->exists($key, $expire);
     }
 
     /**
@@ -333,12 +334,13 @@ LUA;
     /**
      * 一次性插入
      * @param $key
-     * @param $data
-     * @return bool
+     * @param $hashKeys
+     * @param $expire
+     * @return mixed
      */
-    public static function hMSet($key, $hashKeys)
+    public static function hMSet($key, $hashKeys, $expire = self::TOW_MINUTE)
     {
-        return self::getRedisInstance()->hMSet($key, $hashKeys);
+        return self::getRedisInstance()->hMSet($key, $hashKeys)->exists($key, $expire);
     }
 
     /**
@@ -424,6 +426,9 @@ LUA;
 
     /**
      * 设置缓存过期时间
+     * @param $key
+     * @param $expire
+     * @return mixed
      */
     public static function expire($key, $expire)
     {
