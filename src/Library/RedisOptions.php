@@ -340,7 +340,7 @@ LUA;
      */
     public static function hMSet($key, $hashKeys, $expire = self::TOW_MINUTE)
     {
-        return self::getRedisInstance()->hMSet($key, $hashKeys)->exists($key, $expire);
+        return self::getRedisInstance()->hMSet($key, $hashKeys)->expire($key, $expire);
     }
 
     /**
