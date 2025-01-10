@@ -294,7 +294,9 @@ LUA;
      */
     public static function hSet($key, $hashKey, $value, $expire = self::TOW_MINUTE)
     {
-        return self::getRedisInstance()->hSet($key, (string)$hashKey, is_array($value) ? json_encode($value) : $value)->exists($key, $expire);
+        $redis = self::getRedisInstance();
+        $redis->hSet($key, (string)$hashKey, is_array($value) ? json_encode($value) : $value);
+        return $redis->expire($key, $expire);
     }
 
     /**
@@ -340,7 +342,9 @@ LUA;
      */
     public static function hMSet($key, $hashKeys, $expire = self::TOW_MINUTE)
     {
-        return self::getRedisInstance()->hMSet($key, $hashKeys)->expire($key, $expire);
+        $redis = self::getRedisInstance();
+        $redis->hMSet($key, $hashKeys);
+        return $redis->expire($key, $expire);
     }
 
     /**
