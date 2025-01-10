@@ -235,4 +235,15 @@ class CacheOption
     {
         return RedisOptions::hSet($key, $field, $value);
     }
+
+    /**
+     * 设置缓存过期时间
+     * @param $key
+     * @param $ttl
+     * @return bool
+     */
+    private static function expire($key, $ttl)
+    {
+        return RedisOptions::expire($key, $ttl);
+    }
 }

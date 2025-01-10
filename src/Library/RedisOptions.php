@@ -421,4 +421,12 @@ LUA;
     {
         return self::getRedisInstance()->exists($key);
     }
+
+    /**
+     * 设置缓存过期时间
+     */
+    public static function expire($key, $expire)
+    {
+        return self::getRedisInstance()->expire($key, $expire);
+    }
 }
