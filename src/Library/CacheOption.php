@@ -53,9 +53,10 @@ class CacheOption
      * @param $redisKey
      * @param Closure $func
      * @param $field
+     * @param $expire
      * @return void
      */
-    public static function rememberHashMap($key, Closure $callback, $fields = [])
+    public static function rememberHashMap($key, Closure $callback, $fields = [], $expire = null)
     {
         if (!empty($fields)) {
             $data = static::hashMGetRedis($key,$fields);
@@ -73,7 +74,7 @@ class CacheOption
         }
 
         $value = $callback();
-        static::hashMSetRedis($key, $value);
+        static::hashMSetRedis($key, $value, $expire);
         if (!empty($fields)) {
             return array_intersect_key($value, array_flip($fields));
         } else {
@@ -87,16 +88,17 @@ class CacheOption
      * @param $key
      * @param Closure $callback
      * @param $fields
+     * @param $expire
      * @return mixed
      */
-    public static function rememberHash($key, $field, Closure $callback)
+    public static function rememberHash($key, $field, Closure $callback, $expire)
     {
         $data = static::hashGetRedis($key, $field);
         if (!empty($data)) {
             return $data;
         }
         $value = $callback();
-        static::hashSetRedis($key, $field, $value);
+        static::hashSetRedis($key, $field, $value, $expire);
         return $value;
     }
 
